@@ -6,6 +6,8 @@ mod scraper;
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt::init();
+
     let reqwest_client = reqwest::Client::new();
     let scraper = scraper::TargetScraper::new(
         "http://127.0.0.1:9100/metrics".to_string(),

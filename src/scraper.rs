@@ -27,14 +27,15 @@ impl TargetScraper {
             .take(self.max_retries);
 
         Retry::spawn(strategy, || async {
-            tokio::time::timeout(self.timeout, fetch_metrics(&self.url)).await?
+            tokio::time::timeout(self.timeout, fetch_metrics(self.client.clone(), &self.url))
+                .await?
         })
         .await
     }
 }
 
-pub async fn fetch_metrics(url: &str) -> Result<Vec<MetricGroup>, AgentError> {
-    let response = reqwest::get(url).await?;
+pub async fn fetch_metrics(client: Client, url: &str) -> Result<Vec<MetricGroup>, AgentError> {
+    let response = client.get(url).send().await?;
     let body = response.text().await?;
     let parsed = parse_text(&body)?;
     Ok(parsed)

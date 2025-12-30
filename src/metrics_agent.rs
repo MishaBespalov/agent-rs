@@ -1,6 +1,6 @@
 use crate::remote_write::RemoteWriter;
 use crate::scraper::TargetScraper;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use thiserror::Error;
 use tracing::{debug, error};
 
@@ -8,6 +8,12 @@ pub struct MetricsAgent {
     writer: RemoteWriter,
     scraper: TargetScraper,
     interval: Duration,
+}
+
+struct MetricsMessage {
+    target_url: String,
+    formatted_text: String,
+    scraped_at: Instant,
 }
 
 #[derive(Error, Debug)]
