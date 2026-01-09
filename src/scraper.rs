@@ -1,4 +1,4 @@
-use crate::metrics_agent::AgentError;
+use anyhow::Result;
 use std::time::Duration;
 use tokio_retry::{Retry, strategy::ExponentialBackoff};
 
@@ -6,10 +6,10 @@ use prometheus_parser::{MetricGroup, parse_text};
 use reqwest::Client;
 
 pub struct TargetScraper {
-    url: String,
-    client: Client,
-    timeout: Duration,
-    max_retries: usize,
+    pub url: String,
+    pub client: Client,
+    pub timeout: Duration,
+    pub max_retries: usize,
 }
 
 impl TargetScraper {
@@ -21,7 +21,7 @@ impl TargetScraper {
             max_retries,
         }
     }
-    pub async fn scrape(&self) -> Result<Vec<MetricGroup>, AgentError> {
+    pub async fn scrape(&self) -> Result<Vec<MetricGroup>> {
         let strategy = ExponentialBackoff::from_millis(100)
             .max_delay(Duration::from_secs(10))
             .take(self.max_retries);
@@ -34,7 +34,7 @@ impl TargetScraper {
     }
 }
 
-pub async fn fetch_metrics(client: Client, url: &str) -> Result<Vec<MetricGroup>, AgentError> {
+pub async fn fetch_metrics(client: Client, url: &str) -> Result<Vec<MetricGroup>> {
     let response = client.get(url).send().await?;
     let body = response.text().await?;
     let parsed = parse_text(&body)?;

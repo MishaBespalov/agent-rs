@@ -6,6 +6,7 @@ version = 4
 name = "agent-rs"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "indexmap",
  "prometheus-parser",
  "reqwest",
